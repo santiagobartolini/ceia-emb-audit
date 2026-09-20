@@ -1,0 +1,16 @@
+[project]
+name = "ceia-emb-audit"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "santiagobartolini", email = "santiagobartolini@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+ceia-emb-audit = "ceia_emb_audit:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
