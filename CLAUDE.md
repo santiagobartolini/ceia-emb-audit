@@ -13,3 +13,7 @@ Default label vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `read
 ### Domain docs
 
 Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+## Git
+
+Never add "Co-Authored-By: Claude", "Generated with Claude Code", or any claude.ai session link to commit messages or PR descriptions.

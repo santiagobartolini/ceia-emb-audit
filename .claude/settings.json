@@ -1,5 +1,10 @@
 {
   "remote": {
     "defaultEnvironmentId": "env_01Fe2Jm99QoQZ4osPnAm4PHy"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
   }
 }
