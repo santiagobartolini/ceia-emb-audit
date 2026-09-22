@@ -17,3 +17,5 @@ Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/ag
 ## Git
 
 Never add "Co-Authored-By: Claude", "Generated with Claude Code", or any claude.ai session link to commit messages or PR descriptions.
+
+Never open pull requests. Only commit and push to the current session branch; pull requests are created automatically by CI.
