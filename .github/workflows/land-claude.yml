@@ -1,16 +1,16 @@
 name: Land Claude branches
 
 on:
-  # Cada vez que una sesión cloud pushea su rama
+  # Every time a cloud session pushes its branch
   push:
     branches: ['claude/**']
-  # Cuando cerrás (mergeado o no) un PR de review
+  # When a review PR is closed (merged or not)
   pull_request:
     types: [closed]
     branches: [main]
 
-# Si una sesión pushea varias veces seguidas, procesa solo la última.
-# Cada rama tiene su propio grupo: sesiones en paralelo no se pisan.
+# If a session pushes several times in a row, only the latest push is processed.
+# Each branch gets its own group, so parallel sessions don't interfere.
 concurrency:
   group: land-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -25,35 +25,35 @@ env:
 
 jobs:
   land:
-    # No corre cuando el evento es el borrado de una rama
+    # Skip events triggered by branch deletions
     if: github.event_name == 'push' && github.event.deleted == false
     runs-on: ubuntu-latest
     env:
-      # Usa tu token propio si cargaste el secret LANDING_TOKEN;
-      # si no, el token automático de Actions.
+      # Use your own token if the LANDING_TOKEN secret exists;
+      # otherwise fall back to the built-in Actions token.
       GH_TOKEN: ${{ secrets.LANDING_TOKEN || github.token }}
       SRC: ${{ github.ref_name }}
     steps:
-      - name: Checkout con historial completo
+      - name: Checkout with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.LANDING_TOKEN || github.token }}
 
-      - name: Configurar identidad
+      - name: Configure git identity
         run: |
           git config user.name "$AUTHOR_NAME"
           git config user.email "$AUTHOR_EMAIL"
 
-      - name: Reescribir autoría y limpiar mensajes
+      - name: Rewrite authorship and clean commit messages
         run: |
           DEST="review/${SRC#claude/}"
           git checkout -B "$DEST" "origin/$SRC"
 
-          # Reaplica cada commit sobre main, le quita las líneas de
-          # atribución a Claude y lo reescribe a tu nombre.
-          # --force-rebase garantiza que se procesen todos los commits
-          # aunque la rama ya esté al día con main.
+          # Replay every commit on top of main, strip Claude attribution
+          # lines from the message, and re-author it with your identity.
+          # --force-rebase ensures every commit is replayed even when
+          # the branch is already up to date with main.
           git rebase --force-rebase origin/main --exec '
             git log -1 --format=%B \
               | grep -v -i -E "(^Co-Authored-By: Claude|Generated with \[?Claude Code|claude\.ai/code/session_|^Claude-Session:)" \
@@ -67,25 +67,25 @@ jobs:
           if [ "$AHEAD" -gt 0 ]; then
             git push --force origin "$DEST"
           else
-            # Todo lo de esta rama ya está en main (sesión vieja): se limpia.
+            # Everything on this branch is already in main (stale session): clean it up.
             git push origin --delete "$SRC" || true
           fi
 
-      - name: Abrir PR si no existe
+      - name: Open PR if it does not exist
         if: env.AHEAD != '0'
         run: |
           gh pr view "$DEST" >/dev/null 2>&1 || \
             gh pr create --base main --head "$DEST" \
               --title "$(git log -1 --format=%s)" \
-              --body "Cambios de la sesión \`$SRC\`, con autoría reescrita."
+              --body "Changes from session \`$SRC\`, with rewritten authorship."
 
-      - name: Avisar si hubo conflicto
+      - name: Report conflict
         if: failure()
         run: |
-          echo "::error::No se pudo integrar $SRC sobre main (probable conflicto). La rama quedó intacta."
+          echo "::error::Could not land $SRC on top of main (likely a conflict). The branch was left untouched."
 
   cleanup:
-    # Corre al cerrar un PR que venga de una rama review/...
+    # Runs when a PR coming from a review/... branch is closed
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'review/')
     runs-on: ubuntu-latest
     env:
@@ -93,7 +93,7 @@ jobs:
       HEAD: ${{ github.head_ref }}
       REPO: ${{ github.repository }}
     steps:
-      - name: Borrar las ramas de la sesión
+      - name: Delete session branches
         run: |
           gh api -X DELETE "repos/$REPO/git/refs/heads/claude/${HEAD#review/}" || true
           gh api -X DELETE "repos/$REPO/git/refs/heads/$HEAD" || true
