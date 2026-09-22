@@ -21,7 +21,7 @@ permissions:
 
 env:
   AUTHOR_NAME: Santiago Bartolini
-  AUTHOR_EMAIL: TU_EMAIL_NOREPLY
+  AUTHOR_EMAIL: 4937254+santiagobartolini@users.noreply.github.com
 
 jobs:
   land:
