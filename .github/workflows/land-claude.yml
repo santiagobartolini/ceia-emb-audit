@@ -47,6 +47,20 @@ jobs:
 
       - name: Rewrite authorship and clean commit messages
         run: |
+          # git rebase --exec does not accept multi-line commands,
+          # so the rewrite logic lives in its own script.
+          cat > /tmp/clean-commit.sh <<'SCRIPT'
+          #!/usr/bin/env bash
+          msg=$(git log -1 --format=%B \
+            | grep -v -i -E "(^Co-Authored-By: Claude|Generated with \[?Claude Code|claude\.ai/code/session_|^Claude-Session:)" \
+            || true)
+          if [ -z "$(printf '%s' "$msg" | tr -d '[:space:]')" ]; then
+            msg=$(git log -1 --format=%s)
+          fi
+          printf '%s\n' "$msg" | git commit --amend --reset-author -F -
+          SCRIPT
+          chmod +x /tmp/clean-commit.sh
+
           DEST="review/${SRC#claude/}"
           git checkout -B "$DEST" "origin/$SRC"
 
@@ -54,11 +68,7 @@ jobs:
           # lines from the message, and re-author it with your identity.
           # --force-rebase ensures every commit is replayed even when
           # the branch is already up to date with main.
-          git rebase --force-rebase origin/main --exec '
-            git log -1 --format=%B \
-              | grep -v -i -E "(^Co-Authored-By: Claude|Generated with \[?Claude Code|claude\.ai/code/session_|^Claude-Session:)" \
-              | git commit --amend --reset-author -F -
-          '
+          git rebase --force-rebase origin/main --exec /tmp/clean-commit.sh
 
           AHEAD=$(git rev-list --count origin/main..HEAD)
           echo "DEST=$DEST" >> "$GITHUB_ENV"
