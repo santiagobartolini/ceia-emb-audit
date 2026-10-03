@@ -26,4 +26,4 @@ Use Conventional Commits for every commit message (feat:, fix:, docs:, chore:, r
 
 Write all identifiers, docstrings and code comments in English, including test names.
 
-Write user-facing text in Spanish: web UI copy, audit report output, and CLI messages aimed at teachers or students.
+Write user-facing text in Spanish: web UI copy, audit report output, and CLI messages aimed at teachers or students. Spanish is the only language today, but the system may need others later: keep every user-facing string in one place close to the presentation layer, not scattered across the code, and never build sentences by concatenating strings.
