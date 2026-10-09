@@ -34,4 +34,6 @@ When running /implement, call the Skill tool with "tdd" to build the work and wi
 
 Write all identifiers, docstrings and code comments in English, including test names.
 
+Write issues and their comments (specs and tickets included), ADRs and `GLOSSARY.md` entries in English.
+
 Write user-facing text in Spanish: web UI copy, audit report output, and CLI messages aimed at teachers or students. Spanish is the only language today, but the system may need others later: keep every user-facing string in one place close to the presentation layer, not scattered across the code, and never build sentences by concatenating strings.
