@@ -24,6 +24,10 @@ Use Conventional Commits for every commit message (feat:, fix:, docs:, chore:, r
 
 When a commit completes an issue, end its body with `Closes #<number>`: GitHub closes the issue when the commit reaches main, so don't close it yourself.
 
+## Running skills
+
+When code-review runs without a fixed point, compare against `origin/main`.
+
 ## Code style
 
 Write all identifiers, docstrings and code comments in English, including test names.
