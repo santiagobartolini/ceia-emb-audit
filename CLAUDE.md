@@ -22,6 +22,8 @@ Never open pull requests. Only commit and push to the current session branch; pu
 
 Use Conventional Commits for every commit message (feat:, fix:, docs:, chore:, refactor:, test:). Write the entire message in English, both the subject line and the body. Keep the subject short and in the imperative mood.
 
+When a commit completes an issue, end its body with `Closes #<number>`: GitHub closes the issue when the commit reaches main, so don't close it yourself.
+
 ## Code style
 
 Write all identifiers, docstrings and code comments in English, including test names.
