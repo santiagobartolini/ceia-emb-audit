@@ -28,6 +28,8 @@ When a commit completes an issue, end its body with `Closes #<number>`: GitHub c
 
 When code-review runs without a fixed point, compare against `origin/main`.
 
+When running /implement, call the Skill tool with "tdd" to build the work and with "code-review" to review it.
+
 ## Code style
 
 Write all identifiers, docstrings and code comments in English, including test names.
