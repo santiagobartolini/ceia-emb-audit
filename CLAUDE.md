@@ -26,9 +26,9 @@ When a commit completes an issue, end its body with `Closes #<number>`: GitHub c
 
 ## Running skills
 
-When code-review runs without a fixed point, compare against `origin/main`.
+When running /implement, call the Skill tool with "mattpocock-skills:tdd" for the TDD loop and with "mattpocock-skills:code-review" for the final review. Never use the built-in code-review.
 
-When running /implement, call the Skill tool with "tdd" to build the work and with "code-review" to review it.
+The default fixed point for mattpocock-skills:code-review is origin/main.
 
 ## Code style
 
