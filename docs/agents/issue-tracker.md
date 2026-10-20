@@ -12,6 +12,7 @@ Use `gh api` with GitHub's REST API for every operation. Claude Code cloud sessi
 - **Comment on an issue**: `gh api repos/{owner}/{repo}/issues/<number>/comments -f body="..."` for one line, or `-F body=@-` with a heredoc for multi-line bodies.
 - **Apply / remove labels**: `gh api repos/{owner}/{repo}/issues/<number>/labels -f 'labels[]=<label>'` / `gh api -X DELETE repos/{owner}/{repo}/issues/<number>/labels/<label>`.
 - **Close**: comment first if there is something to say, then `gh api -X PATCH repos/{owner}/{repo}/issues/<number> -f state=closed`.
+- **Make an issue a sub-issue of a parent**: `gh api repos/{owner}/{repo}/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is the child's database id (`gh api repos/{owner}/{repo}/issues/<n> --jq .id`), not its `#number`. Where sub-issues aren't enabled, put `Part of #<parent>` at the top of the child body.
 
 ## Pull requests as a triage surface
 
@@ -27,7 +28,7 @@ GitHub shares one number space across issues and PRs, so a bare `#42` may be eit
 
 ## When a skill says "publish to the issue tracker"
 
-Create a GitHub issue, as described above.
+Create a GitHub issue, as described above. When publishing tickets from an existing issue, such as a spec, make each ticket its sub-issue, as described above. Blocking edges between tickets use native issue dependencies, as described under **Blocking** below.
 
 ## When a skill says "fetch the relevant ticket"
 
@@ -38,7 +39,7 @@ Read the issue and its comments, as described above.
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
 
 - **Map**: a single issue labelled `wayfinder:map`, holding the Notes / Decisions-so-far / Fog body. Create it as above with `-f 'labels[]=wayfinder:map'`.
-- **Child ticket**: an issue linked to the map as a GitHub sub-issue: `gh api repos/{owner}/{repo}/issues/<map>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is a database id as described under Blocking. Where sub-issues aren't enabled, add the child to a task list in the map body and put `Part of #<map>` at the top of the child body. Labels: `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
+- **Child ticket**: an issue linked to the map as a GitHub sub-issue (see **Make an issue a sub-issue of a parent** above). Where sub-issues aren't enabled, also add the child to a task list in the map body. Labels: `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
 - **Blocking**: GitHub's **native issue dependencies**, the canonical, UI-visible representation. Add an edge with `gh api --method POST repos/{owner}/{repo}/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`, where `<blocker-db-id>` is the blocker's numeric **database id** (`gh api repos/{owner}/{repo}/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). GitHub reports `issue_dependencies_summary.blocked_by` (open blockers only, the live gate). Where dependencies aren't available, fall back to a `Blocked by: #<n>, #<n>` line at the top of the child body. A ticket is unblocked when every blocker is closed.
 - **Frontier query**: list the map's open children (`gh api repos/{owner}/{repo}/issues/<map>/sub_issues --paginate`, keeping `state` open, or the map's task list), drop any with an open blocker (`issue_dependencies_summary.blocked_by > 0`, or an open issue in the `Blocked by` line) or an assignee; first in map order wins.
 - **Claim**: `gh api repos/{owner}/{repo}/issues/<n>/assignees -f 'assignees[]=santiagobartolini'`, the session's first write. The REST API has no `@me`, and the current-user endpoint isn't reachable from cloud sessions.
