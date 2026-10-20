@@ -30,6 +30,8 @@ When running /implement, call the Skill tool with "mattpocock-skills:tdd" for th
 
 The default fixed point for mattpocock-skills:code-review is origin/main.
 
+When grilling, write each question so it can be understood without the code open: start from what a visitor or an organiser would see, use units they know, and say what changes in practice.
+
 ## Code style
 
 Write all identifiers, docstrings and code comments in English, including test names.
